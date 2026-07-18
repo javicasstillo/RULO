@@ -50,24 +50,26 @@ export default function Products() {
             action={<Button onClick={openNew}><Plus size={16} />Nueva picada</Button>} />
         ) : (
           <table className="data-table w-full">
-            <thead><tr><th>Picada</th><th>Costo</th><th>Precio venta</th><th>Margen</th><th></th></tr></thead>
-            <tbody>
-              {products.map((p) => {
-                const c = productCost(p.recipe, ingredientsById)
-                const m = marginPercent(p.sellPrice, c)
-                return (
-                  <tr key={p.id}>
-                    <td className="font-medium text-ink">{p.name}{p.category && <span className="text-xs text-muted ml-2">· {p.category}</span>}</td>
-                    <td>{money(c)}</td>
-                    <td className="font-semibold">{money(p.sellPrice)}</td>
-                    <td><Badge tone={m >= 40 ? 'success' : m >= 15 ? 'gold' : 'danger'}>{number(m, 1)}%</Badge></td>
-                    <td>
-                      <div className="flex gap-1 justify-end">
-                        <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-lavender text-muted hover:text-ink"><Pencil size={16} /></button>
-                        <button onClick={() => deleteProduct(p.id)} className="p-1.5 rounded-md hover:bg-danger-light text-muted hover:text-danger"><Trash2 size={16} /></button>
-                      </div>
-                    </td>
-                  </tr>
+           <thead><tr><th>Picada</th><th>Costo</th><th>Precio venta</th><th>Ganancia</th><th>Margen</th><th></th></tr></thead>
+<tbody>
+  {products.map((p) => {
+    const c = productCost(p.recipe, ingredientsById)
+    const m = marginPercent(p.sellPrice, c)
+    const profit = (p.sellPrice || 0) - c
+    return (
+      <tr key={p.id}>
+        <td className="font-medium text-ink">{p.name}{p.category && <span className="text-xs text-muted ml-2">· {p.category}</span>}</td>
+        <td>{money(c)}</td>
+        <td className="font-semibold">{money(p.sellPrice)}</td>
+        <td className={`font-semibold ${profit >= 0 ? 'text-success' : 'text-danger'}`}>{money(profit)}</td>
+        <td><Badge tone={m >= 40 ? 'success' : m >= 15 ? 'gold' : 'danger'}>{number(m, 1)}%</Badge></td>
+        <td>
+          <div className="flex gap-1 justify-end">
+            <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-lavender text-muted hover:text-ink"><Pencil size={16} /></button>
+            <button onClick={() => deleteProduct(p.id)} className="p-1.5 rounded-md hover:bg-danger-light text-muted hover:text-danger"><Trash2 size={16} /></button>
+          </div>
+        </td>
+      </tr>
                 )
               })}
             </tbody>
