@@ -8,8 +8,10 @@ import {
 } from '../lib/firestore'
 import { UNIT_TYPES, baseUnitFor, costPer100, number, money } from '../lib/units'
 
+const CATEGORIES = { insumo: 'Insumo (alimento)', packaging: 'Packaging (envases)' }
+
 const emptyForm = {
-  name: '', brand: '', unitType: 'peso', purchaseQty: '', purchaseUnit: 'kg', purchasePrice: '',
+  name: '', brand: '', category: 'insumo', unitType: 'peso', purchaseQty: '', purchaseUnit: 'kg', purchasePrice: '',
   minStock: '', supplier: '', initialStock: '',
 }
 
@@ -21,6 +23,7 @@ export default function Ingredients() {
   const [purchaseForm, setPurchaseForm] = useState({ qty: '', unit: 'kg', price: '', supplier: '', note: '' })
   const [adjustForm, setAdjustForm] = useState({ delta: '', note: '' })
   const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('todos')
 
   const previewCost100 = useMemo(() => {
     if (!form.purchaseQty || !form.purchasePrice) return null
@@ -31,7 +34,7 @@ export default function Ingredients() {
   const openEdit = (ing) => {
     setCurrent(ing)
     setForm({
-      name: ing.name, brand: ing.brand || '', unitType: ing.unitType, purchaseQty: ing.purchaseQty, purchaseUnit: ing.purchaseUnit,
+      name: ing.name, brand: ing.brand || '', category: ing.category || 'insumo', unitType: ing.unitType, purchaseQty: ing.purchaseQty, purchaseUnit: ing.purchaseUnit,
       purchasePrice: ing.purchasePrice, minStock: ing.minStock, supplier: ing.supplier || '', initialStock: '',
     })
     setModal('edit')
@@ -44,6 +47,7 @@ export default function Ingredients() {
     const payload = {
       name: form.name,
       brand: form.brand,
+      category: form.category,
       unitType: form.unitType,
       purchaseQty: Number(form.purchaseQty),
       purchaseUnit: form.purchaseUnit,
@@ -75,19 +79,41 @@ export default function Ingredients() {
     setModal(null)
   }
 
-  const filtered = ingredients.filter((i) => i.name?.toLowerCase().includes(search.toLowerCase()))
+  const filtered = ingredients
+    .filter((i) => i.name?.toLowerCase().includes(search.toLowerCase()))
+    .filter((i) => categoryFilter === 'todos' || (i.category || 'insumo') === categoryFilter)
 
   return (
     <Layout
       title="Insumos y stock"
-      subtitle="Cargá lo que comprás y el sistema calcula el costo por 100 g / 100 ml automáticamente"
+      subtitle="Cargá alimentos y packaging (tablas, bandejas, potes) — el sistema calcula el costo por 100 g/ml o por unidad automáticamente"
       action={<Button onClick={openNew}><Plus size={16} />Nuevo insumo</Button>}
     >
-      <Input placeholder="Buscar insumo…" value={search} onChange={(e) => setSearch(e.target.value)} className="mb-4 max-w-xs" />
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <Input placeholder="Buscar insumo…" value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-xs" />
+        <div className="flex gap-1 bg-lavender rounded-lg p-1">
+          {[
+            ['todos', 'Todos'],
+            ['insumo', 'Insumos'],
+            ['packaging', 'Packaging'],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setCategoryFilter(key)}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+                categoryFilter === key ? 'bg-white text-ink shadow-soft' : 'text-muted hover:text-ink'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <Card>
         {filtered.length === 0 ? (
-          <EmptyState icon={Wheat} title="Todavía no cargaste insumos" subtitle="Sumá jamón, queso, pan, aceitunas… lo que uses para armar tus picadas." action={<Button onClick={openNew}><Plus size={16} />Nuevo insumo</Button>} />
+          <EmptyState icon={Wheat} title="Todavía no cargaste insumos" subtitle="Sumá jamón, queso, pan, aceitunas… y también tu packaging: tablas, bandejas, potes, film." action={<Button onClick={openNew}><Plus size={16} />Nuevo insumo</Button>} />
         ) : (
           <table className="data-table w-full">
             <thead>
@@ -102,7 +128,10 @@ export default function Ingredients() {
                 return (
                   <tr key={i.id}>
                     <td className="font-medium text-ink">
-                      {i.name}
+                      <div className="flex items-center gap-2">
+                        {i.name}
+                        {i.category === 'packaging' && <Badge tone="gold">Packaging</Badge>}
+                      </div>
                       {(i.brand || i.supplier) && (
                         <div className="text-xs text-muted">
                           {[i.brand, i.supplier].filter(Boolean).join(' · ')}
@@ -135,9 +164,12 @@ export default function Ingredients() {
       <Modal open={modal === 'new' || modal === 'edit'} onClose={() => setModal(null)} title={modal === 'new' ? 'Nuevo insumo' : 'Editar insumo'}>
         <form onSubmit={submitForm} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Nombre" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jamón crudo" />
+            <Input label="Nombre" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jamón crudo / Bandeja cartón chica" />
             <Input label="Marca (opcional)" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} placeholder="Paladini" />
           </div>
+          <Select label="Categoría" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+            {Object.entries(CATEGORIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </Select>
           <div className="grid grid-cols-2 gap-3">
             <Select label="Tipo" value={form.unitType} onChange={(e) => {
               const unitType = e.target.value

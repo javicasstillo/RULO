@@ -97,7 +97,7 @@ export default function Products() {
                   return (
                     <div key={idx} className="flex gap-2 items-end bg-lavender/60 rounded-lg p-2.5">
                       <Select className="flex-1" value={line.ingredientId} onChange={(e) => updateLine(idx, { ingredientId: e.target.value, unit: UNIT_TYPES[ingredientsById[e.target.value]?.unitType || 'peso'].options[0] })}>
-                        {ingredients.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
+                        {ingredients.map((i) => <option key={i.id} value={i.id}>{i.name}{i.category === 'packaging' ? ' (Packaging)' : ''}</option>)}
                       </Select>
                       <Input className="w-24" type="number" step="any" placeholder="Cant." value={line.qty} onChange={(e) => updateLine(idx, { qty: e.target.value })} />
                       <Select className="w-24" value={line.unit} onChange={(e) => updateLine(idx, { unit: e.target.value })}>
