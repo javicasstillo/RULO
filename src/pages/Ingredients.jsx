@@ -9,7 +9,7 @@ import {
 import { UNIT_TYPES, baseUnitFor, costPer100, number, money } from '../lib/units'
 
 const emptyForm = {
-  name: '', unitType: 'peso', purchaseQty: '', purchaseUnit: 'kg', purchasePrice: '',
+  name: '', brand: '', unitType: 'peso', purchaseQty: '', purchaseUnit: 'kg', purchasePrice: '',
   minStock: '', supplier: '', initialStock: '',
 }
 
@@ -31,7 +31,7 @@ export default function Ingredients() {
   const openEdit = (ing) => {
     setCurrent(ing)
     setForm({
-      name: ing.name, unitType: ing.unitType, purchaseQty: ing.purchaseQty, purchaseUnit: ing.purchaseUnit,
+      name: ing.name, brand: ing.brand || '', unitType: ing.unitType, purchaseQty: ing.purchaseQty, purchaseUnit: ing.purchaseUnit,
       purchasePrice: ing.purchasePrice, minStock: ing.minStock, supplier: ing.supplier || '', initialStock: '',
     })
     setModal('edit')
@@ -43,6 +43,7 @@ export default function Ingredients() {
     e.preventDefault()
     const payload = {
       name: form.name,
+      brand: form.brand,
       unitType: form.unitType,
       purchaseQty: Number(form.purchaseQty),
       purchaseUnit: form.purchaseUnit,
@@ -102,7 +103,11 @@ export default function Ingredients() {
                   <tr key={i.id}>
                     <td className="font-medium text-ink">
                       {i.name}
-                      {i.supplier && <div className="text-xs text-muted">{i.supplier}</div>}
+                      {(i.brand || i.supplier) && (
+                        <div className="text-xs text-muted">
+                          {[i.brand, i.supplier].filter(Boolean).join(' · ')}
+                        </div>
+                      )}
                     </td>
                     <td>{number(i.purchaseQty)} {i.purchaseUnit} · {money(i.purchasePrice)}</td>
                     <td className="font-semibold text-brand-dark">{money(c100)} / 100{i.baseUnit === 'ml' ? 'ml' : i.baseUnit === 'u' ? 'u' : 'g'}</td>
@@ -129,7 +134,10 @@ export default function Ingredients() {
       {/* Nuevo / editar insumo */}
       <Modal open={modal === 'new' || modal === 'edit'} onClose={() => setModal(null)} title={modal === 'new' ? 'Nuevo insumo' : 'Editar insumo'}>
         <form onSubmit={submitForm} className="space-y-4">
-          <Input label="Nombre" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jamón crudo" />
+          <div className="grid grid-cols-2 gap-3">
+            <Input label="Nombre" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jamón crudo" />
+            <Input label="Marca (opcional)" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} placeholder="Paladini" />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <Select label="Tipo" value={form.unitType} onChange={(e) => {
               const unitType = e.target.value

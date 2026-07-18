@@ -33,8 +33,8 @@ export default function Settings() {
     download('rulo_gastos.csv', toCSV(rows, ['fecha', 'categoria', 'descripcion', 'monto']))
   }
   const exportIngredients = () => {
-    const rows = ingredients.map((i) => ({ nombre: i.name, stock: i.currentStock, unidad: i.baseUnit, minimo: i.minStock, costo_compra: i.purchasePrice }))
-    download('rulo_insumos.csv', toCSV(rows, ['nombre', 'stock', 'unidad', 'minimo', 'costo_compra']))
+    const rows = ingredients.map((i) => ({ nombre: i.name, marca: i.brand || '', stock: i.currentStock, unidad: i.baseUnit, minimo: i.minStock, costo_compra: i.purchasePrice }))
+    download('rulo_insumos.csv', toCSV(rows, ['nombre', 'marca', 'stock', 'unidad', 'minimo', 'costo_compra']))
   }
 
   return (
