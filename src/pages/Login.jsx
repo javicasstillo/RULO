@@ -34,9 +34,6 @@ export default function Login() {
             {loading ? 'Ingresando…' : 'Ingresar'}
           </Button>
         </form>
-        <p className="text-xs text-muted text-center mt-4">
-          Creá tu usuario desde Firebase Console → Authentication → Email/Password.
-        </p>
       </div>
     </div>
   )
