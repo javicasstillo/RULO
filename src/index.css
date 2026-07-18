@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply bg-cream text-ink font-sans antialiased;
+}
+
+::selection {
+  @apply bg-brand-light text-brand-dark;
+}
+
+/* Brush-stroke underline used as the app's signature accent */
+.brush-underline {
+  position: relative;
+}
+.brush-underline::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -4px;
+  bottom: -6px;
+  height: 6px;
+  background: currentColor;
+  opacity: 0.9;
+  border-radius: 3px 6px 4px 7px / 4px 3px 5px 4px;
+  transform: rotate(-0.6deg);
+}
+
+table.data-table th {
+  @apply text-left text-xs font-semibold uppercase tracking-wide text-muted border-b border-border py-2 px-3;
+}
+table.data-table td {
+  @apply text-sm py-2.5 px-3 border-b border-border/70;
+}
+table.data-table tbody tr:hover {
+  @apply bg-lavender/60;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #E1DEF4;
+  border-radius: 4px;
+}
