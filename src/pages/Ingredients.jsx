@@ -120,7 +120,7 @@ export default function Ingredients() {
                         <button title="Registrar compra" onClick={() => openPurchase(i)} className="p-1.5 rounded-md hover:bg-lavender text-muted hover:text-brand"><PackagePlus size={16} /></button>
                         <button title="Ajustar stock" onClick={() => openAdjust(i)} className="p-1.5 rounded-md hover:bg-lavender text-muted hover:text-ink"><SlidersHorizontal size={16} /></button>
                         <button title="Editar" onClick={() => openEdit(i)} className="p-1.5 rounded-md hover:bg-lavender text-muted hover:text-ink"><Pencil size={16} /></button>
-                        <button title="Eliminar" onClick={() => deleteIngredient(i.id)} className="p-1.5 rounded-md hover:bg-danger-light text-muted hover:text-danger"><Trash2 size={16} /></button>
+                        <button title="Eliminar" onClick={() => confirm(`¿Eliminar "${i.name}"? Esta acción no se puede deshacer.`) && deleteIngredient(i.id)} className="p-1.5 rounded-md hover:bg-danger-light text-muted hover:text-danger"><Trash2 size={16} /></button>
                       </div>
                     </td>
                   </tr>
